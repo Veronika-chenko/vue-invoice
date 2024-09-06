@@ -8,11 +8,8 @@
 
 <script>
 export default {
-  name: 'navigation'
-  //   setup() {
-  //     return {}
-  //   }
-}
+  name: 'navigation',
+};
 </script>
 
 <style lang="scss" scoped>

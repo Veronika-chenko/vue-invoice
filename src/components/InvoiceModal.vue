@@ -111,7 +111,7 @@
           <label for="paymentTerms">Payment Terms</label>
           <select require type="text" id="paymentTerms" v-model="paymentTerms">
             <option value="30">Net 30 Days</option>
-            <option value="30">Net 60 Days</option>
+            <option value="60">Net 60 Days</option>
           </select>
         </div>
         <div class="input flex flex-column">
@@ -134,7 +134,7 @@
             </tr>
 
             <tr
-              class="table-item flex"
+              class="table-items flex"
               v-for="(item, index) in invoiceItemList"
               :key="index"
             >
@@ -143,7 +143,7 @@
               </td>
               <td class="qty"><input type="text" v-model="item.qty" /></td>
               <td class="price">
-                <input type="text" v-model="item.item.price" />
+                <input type="text" v-model="item.price" />
               </td>
               <td class="total flex">
                 ${{ (item.total = item.qty * item.price) }}
@@ -177,11 +177,12 @@
 
 <script>
 import { mapMutations } from 'vuex';
+import { uid } from 'uid';
 export default {
   name: 'invoicement',
   data() {
     return {
-      //   dateOptions: { year: 'numeric', month: 'short', day: 'numeric' },
+      dateOptions: { year: 'numeric', month: 'short', day: 'numeric' },
       //   docId: null,
       //   loading: null,
       billerStreetAddress: null,
@@ -206,10 +207,44 @@ export default {
       invoiceTotal: 0,
     };
   },
+  created() {
+    // get current date for invoice date field
+    this.invoiceDateUnix = Date.now();
+    this.invoiceDate = new Date(this.invoiceDateUnix).toLocaleDateString(
+      'en-us',
+      this.dateOptions
+    );
+  },
   methods: {
     ...mapMutations(['TOGGLE_INVOICE']),
     closeInvoice() {
       this.TOGGLE_INVOICE();
+    },
+
+    addNewInvoiceItem() {
+      this.invoiceItemList.push({
+        id: uid(),
+        itemName: '',
+        qty: '',
+        price: 0,
+        total: 0,
+      });
+    },
+    deleteInvoiceItem(id) {
+      this.invoiceItemList = this.invoiceItemList.filter(
+        (item) => item.id !== id
+      );
+    },
+  },
+  watch: {
+    paymentTerms() {
+      const futureDate = new Date();
+      this.paymentDueDateUnix = futureDate.setDate(
+        futureDate.getDate() + parseInt(this.paymentTerms)
+      );
+      this.paymentDueDate = new Date(
+        this.paymentDueDateUnix
+      ).toLocaleDateString('en-us', this.dateOptions);
     },
   },
 };
@@ -218,6 +253,7 @@ export default {
 <style lang="scss" scoped>
 .invoice-wrap {
   position: fixed;
+  z-index: 5;
   top: 0;
   left: 0;
   background-color: transparent;
@@ -282,7 +318,7 @@ export default {
 
           /* Item Table Styling */
           .table-heading,
-          .table-item {
+          .table-items {
             gap: 16px;
             font-size: 12px;
 
@@ -322,6 +358,7 @@ export default {
               right: 0;
               width: 12px;
               height: 16px;
+              cursor: pointer;
             }
           }
         }

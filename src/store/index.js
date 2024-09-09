@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-import { db, getInvoices } from '../firebase';
+import { db, deleteInvoiceService, getInvoices } from '../firebase';
 
 export default createStore({
   state: {
@@ -31,6 +31,12 @@ export default createStore({
     },
     TOGGLE_EDIT_INVOICE(state) {
       state.editInvoice = !state.editInvoice;
+    },
+
+    DELETE_INVOICE(state, payload) {
+      state.invoiceData = state.invoiceData.filter(
+        (invoice) => invoice.docId !== payload
+      );
     },
   },
   actions: {
@@ -67,6 +73,21 @@ export default createStore({
         }
       });
       commit('INVOICES_LOADED');
+    },
+    async UPDATE_INVOICE({ commit, dispatch }, { docId, routeId }) {
+      commit('DELETE_INVOICE', docId);
+      await dispatch('GET_INVOICES');
+      commit('TOGGLE_INVOICE');
+      commit('TOGGLE_EDIT_INVOICE');
+      commit('SET_CURRENT_INVOICE', routeId);
+    },
+
+    async DELETE_INVOICE({ commit }, docId) {
+      // const getInvoice = db.collection('invoice').doc(docId);
+      // await getInvoice.delete();
+      await deleteInvoiceService(db, 'invoice', docId);
+
+      commit('DELETE_INVOICE', docId);
     },
   },
   modules: {},

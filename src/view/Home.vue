@@ -25,11 +25,27 @@
         </div>
       </div>
     </div>
+    <!-- Invoices -->
+    <div v-if="invoiceData.length > 0">
+      <Invoice
+        v-for="(invoice, index) in invoiceData"
+        v-bind:invoice="invoice"
+        :key="index"
+      />
+    </div>
+    <div v-else class="empty flex flex-column">
+      <img src="@/assets/illustration-empty.svg" alt="" />
+      <h3>There is nothing here</h3>
+      <p>
+        Create a new invoice by clicking the New Invoice button and get started
+      </p>
+    </div>
   </div>
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import Invoice from '../components/Invoice.vue';
+import { mapMutations, mapState } from 'vuex';
 export default {
   name: 'Home',
   data() {
@@ -37,7 +53,7 @@ export default {
       filterMenu: null,
     };
   },
-  components: {},
+  components: { Invoice },
   methods: {
     ...mapMutations(['TOGGLE_INVOICE']),
     newInvoice() {
@@ -46,6 +62,9 @@ export default {
     toggleFilterMenu() {
       this.filterMenu = !this.filterMenu;
     },
+  },
+  computed: {
+    ...mapState(['invoiceData']),
   },
 };
 </script>
@@ -127,6 +146,29 @@ export default {
           }
         }
       }
+    }
+  }
+
+  .empty {
+    align-items: center;
+    margin-top: 160px;
+
+    img {
+      width: 214px;
+      height: 200px;
+    }
+
+    h3 {
+      font-size: 20px;
+      margin-top: 40px;
+    }
+
+    p {
+      text-align: center;
+      max-width: 224px;
+      margin-top: 16px;
+      font-size: 12px;
+      font-weight: 300;
     }
   }
 }

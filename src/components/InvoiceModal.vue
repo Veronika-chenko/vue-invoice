@@ -188,7 +188,7 @@ import { mapMutations } from 'vuex';
 import { uid } from 'uid';
 import Loading from '../components/Loading.vue';
 export default {
-  name: 'invoicement',
+  name: 'invoiceModal',
   data() {
     return {
       dateOptions: { year: 'numeric', month: 'short', day: 'numeric' },

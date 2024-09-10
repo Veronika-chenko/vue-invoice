@@ -1,14 +1,15 @@
-# vue-invoice
+# Vue Invoice App
 
-This template should help get you started developing with Vue 3 in Vite.
+## Project Description
 
-## Recommended IDE Setup
+This is a **CRUD (Create, Read, Update, Delete) Invoice App** built using **Vue 3**, **Vuex**, and **Firebase**.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+The app enables users to:
 
-## Customize configuration
+- Create, read, update, and delete invoices.
+- Filter invoices by status (Paid, Pending, Draft).
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+**Note:** This app is not supported on mobile devices.
 
 ## Project Setup
 

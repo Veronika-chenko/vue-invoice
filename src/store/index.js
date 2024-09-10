@@ -1,5 +1,9 @@
 import { createStore } from 'vuex';
-import { db, deleteInvoiceService, getInvoices } from '../firebase';
+import {
+  deleteInvoiceService,
+  getInvoices,
+  updateStatusService,
+} from '../firebase';
 
 export default createStore({
   state: {
@@ -19,7 +23,6 @@ export default createStore({
     },
     SET_INVOICE_DATA(state, payload) {
       state.invoiceData.push(payload);
-      // console.log('🚀 ~ state.invoiceData:', state.invoiceData);
     },
     INVOICES_LOADED(state) {
       state.invoicesLoaded = true;
@@ -38,10 +41,29 @@ export default createStore({
         (invoice) => invoice.docId !== payload
       );
     },
+
+    UPDATE_STATUS_TO_PAID(state, payload) {
+      state.invoiceData.forEach((invoice) => {
+        if (invoice.docId === payload) {
+          invoice.invoicePaid = true;
+          invoice.invoicePending = false;
+        }
+      });
+    },
+
+    UPDATE_STATUS_TO_PENDING(state, payload) {
+      state.invoiceData.forEach((invoice) => {
+        if (invoice.docId === payload) {
+          invoice.invoicePaid = false;
+          invoice.invoicePending = true;
+          invoice.invoiceDraft = false;
+        }
+      });
+    },
   },
   actions: {
     async GET_INVOICES({ commit, state }) {
-      const results = await getInvoices(db, 'invoices');
+      const results = await getInvoices();
       results.forEach((doc) => {
         if (!state.invoiceData.some((invoice) => invoice.docId === doc.id)) {
           const data = {
@@ -83,11 +105,28 @@ export default createStore({
     },
 
     async DELETE_INVOICE({ commit }, docId) {
-      // const getInvoice = db.collection('invoice').doc(docId);
-      // await getInvoice.delete();
-      await deleteInvoiceService(db, 'invoice', docId);
+      await deleteInvoiceService(docId);
 
       commit('DELETE_INVOICE', docId);
+    },
+
+    async UPDATE_STATUS_TO_PAID({ commit }, docId) {
+      const fieldsToUpdate = {
+        invoicePaid: true,
+        invoicePending: false,
+      };
+      await updateStatusService(docId, fieldsToUpdate);
+      commit('UPDATE_STATUS_TO_PAID', docId);
+    },
+
+    async UPDATE_STATUS_TO_PENDING({ commit }, docId) {
+      const fieldsToUpdate = {
+        invoicePaid: false,
+        invoicePending: true,
+        invoiceDraft: false,
+      };
+      await updateStatusService(docId, fieldsToUpdate);
+      commit('UPDATE_STATUS_TO_PENDING', docId);
     },
   },
   modules: {},

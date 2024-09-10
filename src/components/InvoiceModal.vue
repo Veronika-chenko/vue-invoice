@@ -202,7 +202,7 @@
 </template>
 
 <script>
-import { db, setInvoice, updateInvoiceService } from '../firebase';
+import { setInvoice, updateInvoiceService } from '../firebase';
 import { mapActions, mapMutations, mapState } from 'vuex';
 import { uid } from 'uid';
 import Loading from '../components/Loading.vue';
@@ -275,6 +275,7 @@ export default {
   },
   methods: {
     ...mapMutations(['TOGGLE_INVOICE', 'TOGGLE_MODAL', 'TOGGLE_EDIT_INVOICE']),
+
     ...mapActions(['UPDATE_INVOICE', 'GET_INVOICES']),
 
     checkClick(e) {
@@ -299,6 +300,7 @@ export default {
         total: 0,
       });
     },
+
     deleteInvoiceItem(id) {
       this.invoiceItemList = this.invoiceItemList.filter(
         (item) => item.id !== id
@@ -317,7 +319,7 @@ export default {
     },
 
     saveDraft() {
-      this.invoiceDate = true;
+      this.invoiceDraft = true;
     },
 
     async uploadInvoice() {
@@ -330,7 +332,7 @@ export default {
 
       this.calInvoiceTotal();
 
-      await setInvoice(db, 'invoices', {
+      await setInvoice({
         invoiceId: uid(6),
         billerStreetAddress: this.billerStreetAddress,
         billerCity: this.billerCity,
@@ -358,6 +360,8 @@ export default {
       this.loading = false;
 
       this.TOGGLE_INVOICE();
+
+      this.GET_INVOICES();
     },
     async updateInvoice() {
       if (this.invoiceItemList.length <= 0) {
@@ -369,7 +373,7 @@ export default {
 
       this.calInvoiceTotal();
 
-      await updateInvoiceService(db, 'invoices', this.docId, {
+      await updateInvoiceService(this.docId, {
         billerStreetAddress: this.billerStreetAddress,
         billerCity: this.billerCity,
         billerZipCode: this.billerZipCode,
